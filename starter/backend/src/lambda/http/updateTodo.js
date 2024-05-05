@@ -1,7 +1,23 @@
-export function handler(event) {
+import { getUserIdFromEvent } from '../utils.mjs'
+import { updateTodoItem } from '../../businessLogic/todo.mjs'
+export async function handler(event) {
   const todoId = event.pathParameters.todoId
-  const updatedTodo = JSON.parse(event.body)
-  
+  console.log('todoId', todoId)
+  console.log('event', event)
+
+  const updatedTodo = event.body
+  const userId = getUserIdFromEvent(event)
+
+  await updateTodoItem(userId, todoId, updatedTodo)
   // TODO: Update a TODO item with the provided id using values in the "updatedTodo" object
-  return undefined
+  return {
+    statusCode: 201,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+      'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT,DELETE,PATCH',
+      'Access-Control-Allow-Headers': 'Origin, Content-Type, Accept'
+    },
+    body: ''
+  }
 }

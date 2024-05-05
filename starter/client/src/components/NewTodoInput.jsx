@@ -12,9 +12,10 @@ export function NewTodoInput({ onNewTodo }) {
   const onTodoCreate = async (event) => {
     try {
       const accessToken = await getAccessTokenSilently({
-        audience: `https://test-endpoint.auth0.com/api/v2/`,
+        audience: `https://dev-f7omoxdquozauzab.us.auth0.com/api/v2/`,
         scope: 'write:todos'
       })
+      console.log('Access token in FE', accessToken)
       const dueDate = calculateDueDate()
       const createdTodo = await createTodo(accessToken, {
         name: newTodoName,
