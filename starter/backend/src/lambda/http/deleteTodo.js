@@ -9,8 +9,6 @@ export const handler = middy()
   .use(
     cors({
       credentials: true,
-      headers:
-        'Access-Control-Allow-Origin,Access-Control-Allow-Credentials,Access-Control-Allow-Methods,Access-Control-Allow-Headers',
       methods: 'DELETE'
     })
   )
