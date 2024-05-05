@@ -9,7 +9,6 @@ export async function handler(event) {
   const userId = getUserIdFromEvent(event)
 
   await updateTodoItem(userId, todoId, updatedTodo)
-  // TODO: Update a TODO item with the provided id using values in the "updatedTodo" object
   return {
     statusCode: 201,
     headers: {
