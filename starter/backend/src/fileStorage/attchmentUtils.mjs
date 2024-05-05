@@ -1,9 +1,6 @@
-import * as AWS from 'aws-sdk'
-import * as AWSXRay from 'aws-xray-sdk'
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 
-//const XAWS = AWSXRay.captureAWS(AWS)
 const s3BucketName = process.env.TODO_S3_BUCKET
 const urlExpirationTime = process.env.SIGNED_URL_EXPIRATION
 

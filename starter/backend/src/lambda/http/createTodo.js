@@ -4,7 +4,6 @@ import { AttachmentUtils } from '../../fileStorage/attchmentUtils.mjs'
 import httpErrorHandler from '@middy/http-error-handler'
 import middy from '@middy/core'
 import cors from '@middy/http-cors'
-import createError from 'http-errors'
 
 export const handler = middy()
   .use(httpErrorHandler())
@@ -14,7 +13,6 @@ export const handler = middy()
     })
   )
   .handler(async (event) => {
-    const attachmentUtils = new AttachmentUtils()
     //handle Auth
     console.log('event', event)
 

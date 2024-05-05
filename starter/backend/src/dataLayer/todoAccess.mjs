@@ -1,8 +1,7 @@
 import { DynamoDB } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb'
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import { S3Client } from '@aws-sdk/client-s3'
 
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { AttachmentUtils } from '../fileStorage/attchmentUtils.mjs'
 import AWSXRay from 'aws-xray-sdk-core'
 

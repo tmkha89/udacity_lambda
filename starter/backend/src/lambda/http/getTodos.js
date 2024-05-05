@@ -1,5 +1,3 @@
-import middy from '@middy/core'
-import httpErrorHandler from '@middy/http-error-handler'
 import { getAllToDosByUserId } from '../../businessLogic/todo.mjs'
 import { getUserIdFromEvent } from '../utils.mjs'
 
