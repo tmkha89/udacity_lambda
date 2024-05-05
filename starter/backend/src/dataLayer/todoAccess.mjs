@@ -27,10 +27,7 @@ export class ToDoAccess {
   async createToDoItem(userId, todoId, bodyRequest) {
     console.log('userId', userId)
     console.log('todoId', todoId)
-    // console.log('Create new to do item: ', bodyRequest)
     const timestamp = new Date().toISOString()
-
-    // /console.log('bodyRequest parse - ', JSON.parse(bodyRequest))
 
     const newItem = {
       userId,
@@ -38,19 +35,16 @@ export class ToDoAccess {
       timestamp,
       done: false,
       attachmentUrl: attachmentUtils.getAttachmentUrl(todoId),
-      name: bodyRequest.name,
-      dueDate: bodyRequest.dueDate
-      //name: JSON.parse(bodyRequest).name,
-      //dueDate: JSON.parse(bodyRequest).dueDate
+
+      name: JSON.parse(bodyRequest).name,
+      dueDate: JSON.parse(bodyRequest).dueDate
     }
-    console.log('new Item a', newItem)
+    console.log('new Item', newItem)
 
     await this.dynamoDbClient.put({
       TableName: this.toDoTable,
       Item: newItem
     })
-
-    console.log('new Item b')
 
     return newItem
   }
