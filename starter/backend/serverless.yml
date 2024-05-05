@@ -121,6 +121,7 @@ functions:
       - http:
           method: delete
           path: todos/{todoId}
+          cors: true
     iamRoleStatementsName: deleteToDoRole
     iamRoleStatements:
       - Effect: Allow

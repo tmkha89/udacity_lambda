@@ -8,8 +8,7 @@ export const handler = middy()
   .use(httpErrorHandler())
   .use(
     cors({
-      credentials: true,
-      methods: 'DELETE'
+      credentials: true
     })
   )
   .handler(async (event) => {
