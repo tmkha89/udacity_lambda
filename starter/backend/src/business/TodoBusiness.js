@@ -12,9 +12,9 @@ import {
 const logger = createLogger('businessLogic');
 
 // Retrieve todos by userId
-export async function getByUserId(userId) {
-  logger.info(`getByUserId ${userId}`);
-  return getTodosByUserId(userId);
+export async function getByUserId(userId, pageSize, nextPageKey) {
+  logger.info(`getByUserId ${userId}, pagesize ${pageSize} nextPageKey ${nextPageKey}`);
+  return getTodosByUserId(userId, pageSize, nextPageKey);
 }
 
 // Create a new todo item

@@ -19,12 +19,11 @@ export async function getTodosByUserId(userId, pageSize, nextPageKey) {
   logger.info(`Getting all TODOs for user ${userId}, pageSize: ${pageSize}, page ${nextPageKey}`);
 
   let params = {
-    TableName: this.todosTable,
+    TableName: todosTable,
     KeyConditionExpression: 'userId = :userId',
     ExpressionAttributeValues: {
       ':userId': userId,
     },
-    ProjectionExpression: 'todoId, userId, attachmentUrl, dueDate, createdAt, name, done',
   };
 
   // Conditionally add pagination parameters if provided
@@ -38,21 +37,11 @@ export async function getTodosByUserId(userId, pageSize, nextPageKey) {
   logger.info(`Getting all TODOs for user, params:`, params);
 
   try {
-    const result = await this.dynamoDbClient.query(params).promise();
+    const result = await dynamoDbClient.query(params);
     logger.info('Get Todos successfully', result);
 
-    const items = result.Items.map(item => ({
-      todoId: item.todoId,
-      userId: item.userId,
-      attachmentUrl: item.attachmentUrl,
-      dueDate: item.dueDate,
-      createdAt: item.createdAt,
-      name: item.name,
-      done: item.done
-    }));
-
     return {
-      items,
+      items: result.Items,
       nextPageKey: result.LastEvaluatedKey // undefined if no more pages
     };
   } catch (error) {

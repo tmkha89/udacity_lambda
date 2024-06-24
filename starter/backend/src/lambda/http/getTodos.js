@@ -27,9 +27,9 @@ export const handler = middy()
     const eventRequest = JSON.parse(event.body);
 
     // Get pagination info
-    let pageSize = eventRequest.pageSize;
-    let nextPageKey = eventRequest.nextPageKey;
-
+    let pageSize = event.parameters && event.parameters['pageSize'] ? event.parameters['pageSize'] : null;
+    let nextPageKey = event.parameters && event.parameters['nextPageKey'] ? event.parameters['nextPageKey'] : null;
+    
     // Get the userId using a utility function
     const userId = getUserId(event)
     // Retrieve items associated with the userId from business logic
