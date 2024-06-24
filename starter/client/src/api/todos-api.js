@@ -1,10 +1,13 @@
 import Axios from 'axios'
+import { SERVERLESS_ENDPOINT } from '../config'
 
-export async function getTodos(idToken) {
+const apiEnpoint = SERVERLESS_ENDPOINT
+
+export async function getTodos(idToken, limit, nextPageKey) {
   console.log('Fetching todos')
 
   const response = await Axios.get(
-    `${process.env.REACT_APP_API_ENDPOINT}/todos`,
+    `${apiEnpoint}/todos`,
     {
       headers: {
         'Content-Type': 'application/json',
@@ -12,13 +15,13 @@ export async function getTodos(idToken) {
       }
     }
   )
-  console.log('Todos:', response.data)
+
   return response.data.items
 }
 
 export async function createTodo(idToken, newTodo) {
   const response = await Axios.post(
-    `${process.env.REACT_APP_API_ENDPOINT}/todos`,
+    `${apiEnpoint}/todos`,
     JSON.stringify(newTodo),
     {
       headers: {
@@ -32,7 +35,7 @@ export async function createTodo(idToken, newTodo) {
 
 export async function patchTodo(idToken, todoId, updatedTodo) {
   await Axios.patch(
-    `${process.env.REACT_APP_API_ENDPOINT}/todos/${todoId}`,
+    `${apiEnpoint}/todos/${todoId}`,
     JSON.stringify(updatedTodo),
     {
       headers: {
@@ -44,7 +47,7 @@ export async function patchTodo(idToken, todoId, updatedTodo) {
 }
 
 export async function deleteTodo(idToken, todoId) {
-  await Axios.delete(`${process.env.REACT_APP_API_ENDPOINT}/todos/${todoId}`, {
+  await Axios.delete(`${apiEnpoint}/todos/${todoId}`, {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${idToken}`
@@ -54,7 +57,7 @@ export async function deleteTodo(idToken, todoId) {
 
 export async function getUploadUrl(idToken, todoId) {
   const response = await Axios.post(
-    `${process.env.REACT_APP_API_ENDPOINT}/todos/${todoId}/attachment`,
+    `${apiEnpoint}/todos/${todoId}/attachment`,
     '',
     {
       headers: {

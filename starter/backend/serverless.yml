@@ -21,7 +21,7 @@ provider:
     TODOS_TABLE: tbl-todos-lambda-${self:provider.stage}
     CREATED_AT_INDEX: CreatedAtIndex
     S3_BUCKET_NAME: serverless-attachment-images-${self:provider.stage}
-    SIGNED_URL_EXPIRATION: 300
+    SIGNED_URL_EXPIRATION: 3600
 
   iam:
     role:
@@ -76,6 +76,9 @@ functions:
           path: todos
           cors: true
           authorizer: Auth
+          request:
+            schemas:
+              application/json: ${file(src/models/createTodoRequest.json)}
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -95,6 +98,9 @@ functions:
           path: todos/{todoId}
           cors: true
           authorizer: Auth
+          request:
+            schemas:
+              application/json: ${file(src/models/updateTodoRequest.json)}
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -173,3 +179,58 @@ resources:
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
+
+    S3Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.S3_BUCKET_NAME}
+        PublicAccessBlockConfiguration:
+          BlockPublicPolicy: false
+          RestrictPublicBuckets: false
+        CorsConfiguration:
+          CorsRules:
+            - AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - POST
+                - DELETE
+                - HEAD
+                - PUT
+              MaxAge: 3600
+
+    BucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        PolicyDocument:
+          Id: BucketAttachmentPolicy
+          Version: "2012-10-17"
+          Statement:
+            - Sid: PublicAccessBucketObjects
+              Effect: Allow
+              Principal: '*'
+              Action: '*'
+              Resource: 'arn:aws:s3:::${self:provider.environment.S3_BUCKET_NAME}/*'
+        Bucket: !Ref S3Bucket
+
+    RequestBodyValidator:
+      Type: AWS::ApiGateway::RequestValidator
+      Properties:
+        Name: 'request-body-validator'
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: false
+
+    GatewayResponseDefault4XX:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'*'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: ApiGatewayRestApi

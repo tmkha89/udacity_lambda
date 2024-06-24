@@ -7,6 +7,10 @@ import {
   updateExistingTodoItem,
   updateExistsTodoAttachmentUrl
 } from "../dataLayer/TodosAccess.js";
+import {PutObjectCommand, S3Client} from '@aws-sdk/client-s3'
+import {getSignedUrl} from '@aws-sdk/s3-request-presigner'
+
+const s3Client = new S3Client();
 
 // Create a logger instance for logging business logic events
 const logger = createLogger('businessLogic');
@@ -50,17 +54,16 @@ export async function updateTodoAttachmentUrl(userId, todoId, image, attachmentU
 
 // Generate a signed URL for uploading an attachment to S3
 export async function generateAttachmentSignUrl(todoId) {
-  // Create a command to put an object in S3
   const command = new PutObjectCommand({
-    Bucket: process.env.IMAGES_S3_BUCKET, // S3 bucket name from environment variables
-    Key: todoId  // Key is the todoId
+    Bucket: process.env.S3_BUCKET_NAME, // S3 bucket name from environment variables
+    Key: todoId
   });
 
   logger.info(`generateAttachmentSignUrl`);
 
   // Generate a signed URL with an expiration
   return await getSignedUrl(s3Client, command, {
-    expiresIn: urlExpiration
+    expiresIn: process.env.SIGNED_URL_EXPIRATION
   });
 }
 

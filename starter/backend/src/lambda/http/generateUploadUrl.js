@@ -2,7 +2,7 @@ import middy from '@middy/core';
 import cors from '@middy/http-cors';
 import httpErrorHandler from '@middy/http-error-handler';
 import { createLogger } from '../../utils/logger.mjs';
-import { updateTodoAttachmentUrl, generateAttachmentSignUrl } from '../../bussinessLogic/TodoBusiness.js';
+import { updateTodoAttachmentUrl, generateAttachmentSignUrl } from '../../business/TodoBusiness.js';
 import { getUserId } from "../utils.mjs";
 
 const loggerInstance = createLogger('httpHandler');
@@ -19,15 +19,15 @@ export const handler = middy()
     const requestBody = JSON.parse(lambdaEvent.body);
     const userId = getUserId(lambdaEvent);
 
-    const signedUploadUrl = await generateAttachmentSignUrl(todoItemId);
-    const attachmentUrl = `https://${bucketName}.s3.amazonaws.com/${todoItemId}`;
+    const uploadUrl = await generateAttachmentSignUrl(todoItemId);
+    const attachmentUrl = `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/${todoItemId}`;
     
     await updateTodoAttachmentUrl(userId, todoItemId, requestBody, attachmentUrl);
 
     return {
       statusCode: 201,
       body: JSON.stringify({
-        signedUploadUrl
+        uploadUrl
       })
     };
   });

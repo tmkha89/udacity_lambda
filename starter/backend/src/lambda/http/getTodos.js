@@ -39,7 +39,7 @@ export const handler = middy()
     return {
       statusCode: 200,
       body: JSON.stringify({
-        items  // Include retrieved items in the response body
+        items: items.items
       })
     }
   })

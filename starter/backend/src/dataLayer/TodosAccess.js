@@ -24,6 +24,7 @@ export async function getTodosByUserId(userId, pageSize, nextPageKey) {
     ExpressionAttributeValues: {
       ':userId': userId,
     },
+    ScanIndexForward: false
   };
 
   // Conditionally add pagination parameters if provided

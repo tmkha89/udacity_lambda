@@ -20,17 +20,11 @@ export const handler = middy()
     const todoId = event.pathParameters.todoId
     
     logger.info(`Processing deleteTodo ${todoId}`)
-    // Get the userId using a utility function
     const userId = getUserId(event)
 
-    // Call a business function (deleteTodo) to delete the todo item for the userId
     await deleteTodo(userId, todoId)
 
-    // Return a successful response
     return {
-      statusCode: 200,
-      body: {
-        message: 'Delete successfully'
-      }
+      statusCode: 204
     }
   })
