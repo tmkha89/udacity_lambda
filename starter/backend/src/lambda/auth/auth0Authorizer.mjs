@@ -1,15 +1,31 @@
-import Axios from 'axios'
-import jsonwebtoken from 'jsonwebtoken'
-import { createLogger } from '../../utils/logger.mjs'
+import jsonwebtoken from 'jsonwebtoken';
+import { createLogger } from '../../utils/logger.mjs';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import path, { dirname } from 'path';
 
-const logger = createLogger('auth')
+// Initialize logger for the authentication process
+const logger = createLogger('auth');
 
-const jwksUrl = 'https://test-endpoint.auth0.com/.well-known/jwks.json'
+// Read the Auth0 signing certificate from the file system
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const certFile = path.join(__dirname, 'auth0.crt');
+const pemCert = fs.readFileSync(certFile, 'utf8');
+logger.info('Loaded Auth0 signing certificate', pemCert);
 
+/**
+ * Lambda function handler to authenticate and authorize API requests
+ * @param {Object} event - The Lambda event object
+ * @returns {Object} - The policy document allowing or denying access
+ */
 export async function handler(event) {
   try {
-    const jwtToken = await verifyToken(event.authorizationToken)
+    // Verify the JWT token from the authorization header
+    const jwtToken = await verifyToken(event.authorizationToken);
+    logger.info('User was authorized', jwtToken);
 
+    // Return a policy document allowing the user to invoke API methods
     return {
       principalId: jwtToken.sub,
       policyDocument: {
@@ -22,10 +38,11 @@ export async function handler(event) {
           }
         ]
       }
-    }
+    };
   } catch (e) {
-    logger.error('User not authorized', { error: e.message })
+    logger.error('User not authorized', { error: e.message });
 
+    // Return a policy document denying the user access
     return {
       principalId: 'user',
       policyDocument: {
@@ -38,26 +55,43 @@ export async function handler(event) {
           }
         ]
       }
-    }
+    };
   }
 }
 
+/**
+ * Verify the JWT token from the authorization header
+ * @param {string} authHeader - The authorization header containing the JWT token
+ * @returns {Object} - The decoded JWT token
+ */
 async function verifyToken(authHeader) {
-  const token = getToken(authHeader)
-  const jwt = jsonwebtoken.decode(token, { complete: true })
+  if (!authHeader) throw new Error('No authorization header');
 
-  // TODO: Implement token verification
-  return undefined;
+  if (!authHeader.toLowerCase().startsWith('bearer ')) {
+    throw new Error('Invalid authorization header');
+  }
+
+  const token = getToken(authHeader);
+  logger.info('Extracted token', { token, pemCert });
+
+  // Verify the JWT token using the Auth0 signing certificate
+  return jsonwebtoken.verify(token, pemCert, { algorithms: ['RS256'] });
 }
 
+/**
+ * Extract the JWT token from the authorization header
+ * @param {string} authHeader - The authorization header
+ * @returns {string} - The extracted JWT token
+ */
 function getToken(authHeader) {
-  if (!authHeader) throw new Error('No authentication header')
+  if (!authHeader) throw new Error('No authentication header');
 
-  if (!authHeader.toLowerCase().startsWith('bearer '))
-    throw new Error('Invalid authentication header')
+  if (!authHeader.toLowerCase().startsWith('bearer ')) {
+    throw new Error('Invalid authentication header');
+  }
 
-  const split = authHeader.split(' ')
-  const token = split[1]
+  const split = authHeader.split(' ');
+  const token = split[1];
 
-  return token
+  return token;
 }
